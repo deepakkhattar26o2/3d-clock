@@ -1,21 +1,20 @@
 import * as Three from "three";
 import "./style.css";
 import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 //Create Scene
 const scene = new Three.Scene();
 const canvas = document.querySelector(".webgl");
 
-//Dice model
-//create cube
-// const geometry = new Three.BoxGeometry( 2, 2, 2 );
-// const material = new Three.MeshBasicMaterial( {color: "#00ff83"} );
-// const cube = new Three.Mesh(geometry, material);
+const geometry = new Three.BoxGeometry(
+  180.00004768371582,
+  180.0000802678567,
+  222.0000802678567
+);
+const material = new Three.MeshBasicMaterial({ color: "#FF743E" });
+const facelessCube = new Three.Mesh(geometry, material);
 
-// scene.add(cube);
+scene.add(facelessCube);
 
 //Viewport Sizes
 const sizes = {
@@ -50,24 +49,111 @@ window.addEventListener("resize", () => {
 
 //Controls
 const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+controls.enableDamping = false;
 controls.enablePan = false;
 controls.enableZoom = false;
 
 var cube;
+var secondsUnitCube;
+var secondsUpperCube;
+const epsilon = 0.001;
+let rotationSpeed = Math.PI / 16;
+
+let rotations = {
+  1: function (cube) {
+    let one = setInterval(() => {
+      let xtarget = Math.PI;
+      let xdeltaCondition = Math.abs(xtarget - cube.rotation.x) > epsilon;
+
+      if (xdeltaCondition) {
+        cube.rotation.x += Math.sign(xtarget - cube.rotation.x) * rotationSpeed;
+      } else {
+        cube.rotation.z = 0;
+        clearInterval(one);
+      }
+    }, 10);
+  },
+  2: function (cube) {
+    let two = setInterval(() => {
+      let target = Math.PI / 2;
+      let deltaCondition = Math.abs(cube.rotation.x - target) > epsilon;
+      if (deltaCondition) {
+        cube.rotation.x -= Math.sign(cube.rotation.x - target) * rotationSpeed;
+      } else {
+        clearInterval(two);
+      }
+    }, 10);
+  },
+
+  3: function (cube) {
+    let three = setInterval(() => {
+      let target = -Math.PI / 2;
+      let deltaCondition = Math.abs(cube.rotation.z - target) > epsilon;
+      if (deltaCondition) {
+        cube.rotation.z -= Math.sign(cube.rotation.z - target) * rotationSpeed;
+      } else {
+        clearInterval(three);
+      }
+    }, 10);
+  },
+  4: function (cube) {
+    let four = setInterval(() => {
+      let target = Math.PI / 2;
+      let deltaCondition = Math.abs(target - cube.rotation.z) > epsilon;
+      if (deltaCondition) {
+        cube.rotation.z += Math.sign(target - cube.rotation.z) * rotationSpeed;
+      } else {
+        clearInterval(four);
+      }
+    }, 10);
+  },
+  5: function (cube) {
+    let five = setInterval(() => {
+      let target = -Math.PI;
+      let deltaCondition = Math.abs(cube.rotation.z - target) > epsilon;
+      if (deltaCondition) {
+        cube.rotation.z -= Math.sign(cube.rotation.z - target) * rotationSpeed;
+      } else {
+        clearInterval(five);
+      }
+    }, 10);
+  },
+  6: function (cube) {
+    let six = setInterval(() => {
+      let target = 0;
+      let deltaCondition = Math.abs(cube.rotation.x - target) > epsilon;
+      if (deltaCondition) {
+        cube.rotation.x -= Math.sign(cube.rotation.x - target) * rotationSpeed;
+      } else {
+        clearInterval(six);
+      }
+    }, 10);
+  },
+};
 
 const loader = new GLTFLoader();
 loader.load(
   "assets/scene.gltf",
   function (gltf) {
     cube = gltf.scene;
-    scene.add(gltf.scene);
-    //ROTATIONS
-    //num1
-    cube.rotation.x = Math.PI;
-    // //num3
-    // cube.rotation.y-=Math.PI/2
-    // cube.rotation.x+=Math.PI/2
+    secondsUnitCube = gltf.scene.clone();
+    secondsUpperCube = gltf.scene.clone();
+    const box = new Three.Box3().setFromObject(gltf.scene);
+    const size = box.getSize(new Three.Vector3());
+    console.log(size);
+    secondsUnitCube.position.x = 300;
+    secondsUpperCube.position.x = 300;
+    secondsUpperCube.position.y = 300;
+    secondsUnitCube.rotation.x = Math.PI;
+
+    scene.add(cube);
+    scene.add(secondsUnitCube);
+    scene.add(secondsUpperCube);
+    secondsUpperCube.visible = false;
+    // rotate(cube);
+    secondaryRotation(secondsUnitCube);
+    secondaryRotationTens(cube);
+    // rotate(secondsUnitCube)
   },
   (xhr) => {
     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
@@ -77,102 +163,113 @@ loader.load(
   }
 );
 
-const epsilon = 0.001;
-let rotationSpeed = Math.PI / 128;
-
-let rotations = {
-  2: () => {
-    let target = Math.PI / 2;
-    if (Math.abs(cube.rotation.x - target) > epsilon) {
-      cube.rotation.x -= Math.sign(cube.rotation.x - target) * rotationSpeed;
-    }
-  },
-
-  3: () => {
-    let target = -Math.PI / 2;
-
-    if (Math.abs(cube.rotation.y - target) > epsilon) {
-      cube.rotation.y -= Math.sign(cube.rotation.y - target) * rotationSpeed;
-    }
-  },
-};
-
 const loop = () => {
   window.requestAnimationFrame(loop);
   renderer.render(scene, camera);
 };
 
 loop();
-function rotate(){
-  var number2 = setInterval(() => {
-    if (cube) {
-      let target = Math.PI / 2;
-      let deltaCondition = Math.abs(cube.rotation.x - target) > epsilon;
-      if (deltaCondition) {
-        cube.rotation.x -= Math.sign(cube.rotation.x - target) * rotationSpeed;
-      } else {
-        clearInterval(number2);
-        var number3 = setInterval(() => {
-          if (cube) {
-            let target = -Math.PI / 2;
-            let deltaCondition = Math.abs(cube.rotation.z - target) > epsilon;
-            if (deltaCondition) {
-              cube.rotation.z -= Math.sign(cube.rotation.z - target) * rotationSpeed;
-            } else {
-              clearInterval(number3);
-              var number4 = setInterval(() => {
-                let target = Math.PI / 2;
-                let deltaCondition = Math.abs(target - cube.rotation.z) > epsilon;
-                if (deltaCondition) {
-                  cube.rotation.z += Math.sign(target - cube.rotation.z) * rotationSpeed;
-                } else {
-                  clearInterval(number4);
-                  var number5 = setInterval(() => {
-                    let target = -Math.PI;
-                    let deltaCondition = Math.abs(cube.rotation.z - target) > epsilon;
-                    if (deltaCondition) {
-                      cube.rotation.z -=Math.sign(cube.rotation.z - target) * rotationSpeed;
-                    }
-                    else{
-                      clearInterval(number5)
-                      var number6 = setInterval(()=>{
-                        let target = 0;
-                        let deltaCondition = Math.abs(cube.rotation.x - target ) > epsilon;
-                        if (deltaCondition) {
-                          cube.rotation.x -= Math.sign(cube.rotation.x - target) * rotationSpeed;
-                        }
-                        else{
-                          clearInterval(number6)
-                          var number1 = setInterval(()=>{
-                            let xtarget = Math.PI
-                            let xdeltaCondition = Math.abs(xtarget - target-cube.rotation.x ) > epsilon;
-                            
-                            if (xdeltaCondition) {
-                              cube.rotation.x += Math.sign(xtarget - cube.rotation.x) * rotationSpeed;
-                            }
-                            else{
-                              clearInterval(number1);
-                              cube.rotation.z=0
-                              rotate();
-                            }
+// function rotate(cube) {
+//   var number2 = setInterval(() => {
+//     let target = Math.PI / 2;
+//     let deltaCondition = Math.abs(cube.rotation.x - target) > epsilon;
+//     if (deltaCondition) {
+//       cube.rotation.x -= Math.sign(cube.rotation.x - target) * rotationSpeed;
+//     } else {
+//       clearInterval(number2);
+//       var number3 = setInterval(() => {
+//         let target = -Math.PI / 2;
+//         let deltaCondition = Math.abs(cube.rotation.z - target) > epsilon;
+//         if (deltaCondition) {
+//           cube.rotation.z -=
+//             Math.sign(cube.rotation.z - target) * rotationSpeed;
+//         } else {
+//           clearInterval(number3);
+//           var number4 = setInterval(() => {
+//             let target = Math.PI / 2;
+//             let deltaCondition = Math.abs(target - cube.rotation.z) > epsilon;
+//             if (deltaCondition) {
+//               cube.rotation.z +=
+//                 Math.sign(target - cube.rotation.z) * rotationSpeed;
+//             } else {
+//               clearInterval(number4);
+//               var number5 = setInterval(() => {
+//                 let target = -Math.PI;
+//                 let deltaCondition =
+//                   Math.abs(cube.rotation.z - target) > epsilon;
+//                 if (deltaCondition) {
+//                   cube.rotation.z -=
+//                     Math.sign(cube.rotation.z - target) * rotationSpeed;
+//                 } else {
+//                   clearInterval(number5);
+//                   var number6 = setInterval(() => {
+//                     let target = 0;
+//                     let deltaCondition =
+//                       Math.abs(cube.rotation.x - target) > epsilon;
+//                     if (deltaCondition) {
+//                       cube.rotation.x -=
+//                         Math.sign(cube.rotation.x - target) * rotationSpeed;
+//                     } else {
+//                       clearInterval(number6);
+//                       var number1 = setInterval(() => {
+//                         let xtarget = Math.PI;
+//                         let xdeltaCondition =
+//                           Math.abs(xtarget  - cube.rotation.x) >
+//                           epsilon;
 
-                          }, 5)
-                        }
-                      }, 5)
-                    }
-                  }, 5);
-                }
-              }, 5);
-            }
-          }
-        }, 5);
-      }
+//                         if (xdeltaCondition) {
+//                           cube.rotation.x +=
+//                             Math.sign(xtarget - cube.rotation.x) *
+//                             rotationSpeed;
+//                         } else {
+//                           clearInterval(number1);
+//                           cube.rotation.z = 0;
+//                           rotate(cube);
+//                         }
+//                       }, 5);
+//                     }
+//                   }, 5);
+//                 }
+//               }, 5);
+//             }
+//           }, 5);
+//         }
+//       }, 5);
+//     }
+//   }, 5);
+// }
+
+function secondaryRotation(cube) {
+  let target = 2;
+  let upperTarget = 1;
+  setInterval(() => {
+    if (target < 7) {
+      rotations[target](cube);
+      target++;
+    } else if (target == 7 && upperTarget < 5) {
+      secondsUpperCube.visible = true;
+      rotations[upperTarget](secondsUpperCube);
+      upperTarget++;
+    } else {
+      secondsUpperCube.visible = false;
+      rotations["1"](cube);
+      upperTarget = 1;
+      target = 2;
     }
-  }, 5);
+  }, 1000);
 }
 
-rotate();
-
-// setInterval(()=>{
-//   cube.rotation.z-=Math.PI/128
-// }, 10)
+function secondaryRotationTens(cube) {
+  let target = 1;
+  setInterval(() => {
+    if (target < 6) {
+      facelessCube.visible = false;
+      rotations[target](cube);
+      target++;
+    } 
+    else if(target==6){
+      facelessCube.visible=true;
+      target=1;
+    }
+  }, 10000);
+}
