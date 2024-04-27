@@ -1,26 +1,27 @@
 import rotations from "./rotations";
-export function secondsUnitRotation(cube, upperCube, facelessCube) {
-  let target = 2;
+export function minutesUnitRotation(cube, upperCube, facelessCube) {
+  let target = 1;
   let upperTarget = 1;
   setInterval(() => {
     if (target < 7) {
-      facelessCube.visible=false;
       rotations[target](cube);
+      facelessCube.visible = false;
       target++;
-    } else if (target == 7 && upperTarget < 5) {
+    } else if (target == 7 && upperTarget < 4) {
       upperCube.visible = true;
       rotations[upperTarget](upperCube);
       upperTarget++;
     } else {
       upperCube.visible = false;
-      facelessCube.visible=true;
+      facelessCube.visible = true;
+      // rotations["1"](cube);
       upperTarget = 1;
       target = 1;
     }
-  }, 1000);
+  }, 60000);
 }
 
-export function secondsTensRotation(cube, facelessCube) {
+export function minutesTensRotation(cube, facelessCube) {
   let target = 1;
   setInterval(() => {
     if (target < 6) {
@@ -31,5 +32,5 @@ export function secondsTensRotation(cube, facelessCube) {
       facelessCube.visible = true;
       target = 1;
     }
-  }, 10000);
+  }, 600000);
 }

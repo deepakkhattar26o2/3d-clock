@@ -5,7 +5,7 @@ export function createFacelessCube() {
     180.0000802678567,
     222.0000802678567
   );
-  const material = new Three.MeshBasicMaterial({ color: "#FF743E" });
+  const material = new Three.MeshBasicMaterial({ color: "#FF4B26" });
   const facelessCube = new Three.Mesh(geometry, material);
   return facelessCube;
 }
